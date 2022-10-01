@@ -1,8 +1,8 @@
-import NextAuth from "next-auth";
-import EmailProvider from "next-auth/providers/email";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-import shortId from "lib/shortId";
+import NextAuth from 'next-auth';
+import EmailProvider from 'next-auth/providers/email';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { PrismaClient } from '@prisma/client';
+import shortId from 'lib/shortId';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +15,13 @@ export const authOptions = {
       from: process.env.EMAIL_FROM,
     }),
   ],
+  pages: {
+    signIn: '/auth/signin',
+    // signOut: '/auth/signout',
+    // error: '/auth/error', // Error code passed in query string as ?error=
+    verifyRequest: '/auth/verify-request', // (used for check email message)
+    // newUser: '/auth/new-user' // New users will be directed here on first sign in (leave the property out if not of interest)
+  },
   callbacks: {
     async session({ session, user }: any) {
       if (!user) return session;
@@ -26,13 +33,7 @@ export const authOptions = {
   },
   events: {
     async createUser({ user }: any) {
-      await prisma.author.create({
-        data: {
-          friendlyId: shortId(),
-          name: "Hello world",
-          user: { connect: { id: user.id } },
-        },
-      });
+      // user created, send email or whaterver
     },
   },
 };
